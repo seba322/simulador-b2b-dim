@@ -97,20 +97,22 @@ public:
   }
   void SetStock(int val)
   {
-    // cout << "DISMINUYENDO STOCK DE2  " + id_producto + " A " + to_string(val) << endl;
-    if (val > 0)
-    {
+    // cout << "DISMINUYENDO STOCK DE2  " + id_producto+" con sotck "+to_string(stock) + "  A " + to_string(stock-val) << endl;
+    // if (val > 0)
+    // {
 
-      stock = val;
-    }
-    else
-    {
-      stock = 0;
-    }
+    // }
+    // else
+    // {
+    //   stock = 0;
+    // }
+      stock = stock-val;
+      // cout << "Stock actual modificado"+ to_string(stock) << endl;
   }
 
   int GetStock()
   {
+    // cout << "Stock actual"+ to_string(stock) << endl;
     return stock;
   }
 

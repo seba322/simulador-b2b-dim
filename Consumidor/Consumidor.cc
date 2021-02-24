@@ -230,7 +230,7 @@ void Consumidor::Comprar(Venta *v)
       //  cout << "se cae1 " + to_string(stockActual)+ " --"+to_string(cantidad) << endl;
       if (producto->GetStock() < cantidad)
       {
-         // cout << "ENTRO ACA "+ to_string(v->tipoRecomendacion)<< endl;
+         // cout <<"No Hay stock"<< endl;
          string idSimilar = "-1";
          if (v->tipoRecomendacion == 2)
          {
@@ -256,7 +256,7 @@ void Consumidor::Comprar(Venta *v)
             //  cout << "DISMINUYENDO STOCK DE  " +idSimilar+ "/"+to_string(productoSim->GetStock())+" A "+to_string(productoSim->GetStock()-cantidad) << endl;
             if ((productoSim->GetStock() - cantidad) >= 0)
             {
-               productoSim->SetStock(productoSim->GetStock() - cantidad);
+               productoSim->SetStock(cantidad);
                productoSim->agregarVenta(cantidad);
                lineaAux += " " + idSimilar + " ";
                lineaAux += to_string(itr->second);
@@ -313,7 +313,8 @@ void Consumidor::Comprar(Venta *v)
          // cout << "se cae " + to_string(stockActual-cantidad) << endl;
          //  cout << "DISMINUYENDO STOCK DE  " +idProducto+ "/"+to_string(stockActual)+" A "+to_string(stockActual-cantidad) << endl;
 
-         producto->SetStock(producto->GetStock() - cantidad);
+         producto->SetStock(cantidad);
+         // cout << "Stock actual"+ to_string(producto->GetStock()) << endl;
          producto->agregarVenta(cantidad);
          cantidadCompras++;
          lineaAux += " " + itr->first + " ";
