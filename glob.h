@@ -17,6 +17,7 @@
 #include <limits>
 #include <queue>
 #include <math.h>
+#include <chrono>
 #include <algorithm>
 
 using namespace std;
@@ -79,6 +80,8 @@ class Producto
   int stock;
   int precio;
   int ventas;
+  int stockInicial;
+  int nReposicion;
 
 protected:
   void inner_body(void);
@@ -94,6 +97,8 @@ public:
     puntaje = _puntaje;
     precio = _precio;
     ventas = 0;
+    nReposicion=0;
+    stockInicial=_stock;
   }
   void SetStock(int val)
   {
@@ -108,6 +113,15 @@ public:
     // }
       stock = stock-val;
       // cout << "Stock actual modificado"+ to_string(stock) << endl;
+  }
+  void resetStock(){
+    nReposicion++;
+    stock=stockInicial+(stockInicial*(nReposicion/100));
+  }
+
+  int GetReposicion(){
+    return nReposicion;
+
   }
 
   int GetStock()

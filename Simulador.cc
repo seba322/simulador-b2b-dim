@@ -62,9 +62,7 @@ public:
     strcpy(archivo_segmentos, _archivo_segmentos);
     strcpy(archivo_rubros, _archivo_rubros);
     tipoRec = _tipoRec;
-    strcpy(salida_recomendacion,_salida_recomendacion);
- 
-  
+    strcpy(salida_recomendacion, _salida_recomendacion);
   }
 
 public:
@@ -272,13 +270,18 @@ void sistema::inner_body(void)
   // cout << "escribiendo ventas 1 " << endl;
   // map<string, handle<Consumidor> *>::iterator itr;
   // cout << "escribiendo ventas" << endl;
+  int totalCompras = 0;
+  int nProd = 0;
   map<string, Producto *>::iterator itr;
   for (itr = productos.begin(); itr != productos.end(); itr++)
   {
     auto p = itr->second;
-    string linea = p->GetId() + "," + p->GetJerarquia() + "," + to_string(p->GetStock())+","+to_string(p->GetVentas());
+    string linea = p->GetId() + "," + p->GetJerarquia() + "," + to_string(p->GetStock()) + "," + to_string(p->GetVentas());
+    totalCompras += p->GetVentas();
+    nProd += 1;
     outdata << linea << endl;
   }
+  cout << "total de ventas: " + to_string(totalCompras) + " " + to_string(nProd) << endl;
   outdata.close();
 
   // // cout << "escribiendo ventas" << endl;
@@ -295,10 +298,12 @@ void sistema::inner_body(void)
   // // map<string, handle<Consumidor> *>::iterator itr;
   // // cout << "escribiendo ventas" << endl;
   // auto itr;
+
   for (auto itr = consumidores.begin(); itr != consumidores.end(); itr++)
   {
     auto c = itr->second;
     string linea = itr->first + "," + to_string((itr->second)->GetNCompras()) + "," + to_string((itr->second)->GetVentasFallidas());
+
     outdataClient << linea << endl;
   }
   outdataClient.close();
@@ -340,6 +345,8 @@ void sistema::inner_body(void)
 
 int main(int argc, char *argv[])
 {
+  auto t1 = std::chrono::high_resolution_clock::now();
+
   //ASSERT( argc==7 );
   cout << "1 " << endl;
   //Creacion de archivos
@@ -368,8 +375,8 @@ int main(int argc, char *argv[])
   strcpy(archivo_segmentos, argv[7]);
   strcpy(archivo_rubros, argv[8]);
   tipoRec = atoi(argv[9]);
-  strcpy(salida_recomendacion,argv[10]);
-  
+  strcpy(salida_recomendacion, argv[10]);
+
   cout << archivo_ventas << endl;
   cout << archivo_productos << endl;
   cout << archivo_clientes << endl;
@@ -396,6 +403,12 @@ int main(int argc, char *argv[])
   cout << "6 " << endl;
 
   simulation::instance()->end_simulation();
+  auto t2 = std::chrono::high_resolution_clock::now();
+
+  auto duration = std::chrono::duration_cast<std::chrono::milliseconds>(t2 - t1).count();
+
+cout << "Tiempo:" << endl;
+  std::cout << duration/1000;
 
   //------------------------------------------------------
 

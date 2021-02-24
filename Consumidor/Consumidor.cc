@@ -230,7 +230,7 @@ void Consumidor::Comprar(Venta *v)
       //  cout << "se cae1 " + to_string(stockActual)+ " --"+to_string(cantidad) << endl;
       if (producto->GetStock() < cantidad)
       {
-         // cout <<"No Hay stock"<< endl;
+         cout <<"No Hay stock"<< endl;
          string idSimilar = "-1";
          if (v->tipoRecomendacion == 2)
          {
