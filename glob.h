@@ -114,9 +114,10 @@ public:
       stock = stock-val;
       // cout << "Stock actual modificado"+ to_string(stock) << endl;
   }
-  void resetStock(){
-    nReposicion++;
+  void ResetStock(){
+    nReposicion=nReposicion+1;
     stock=stockInicial+(stockInicial*(nReposicion/100));
+    cout << "Aumentando n reposicion de "+ jerarquia+" "+to_string(nReposicion) << endl;
   }
 
   int GetReposicion(){

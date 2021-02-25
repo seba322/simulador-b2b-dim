@@ -276,7 +276,7 @@ void sistema::inner_body(void)
   for (itr = productos.begin(); itr != productos.end(); itr++)
   {
     auto p = itr->second;
-    string linea = p->GetId() + "," + p->GetJerarquia() + "," + to_string(p->GetStock()) + "," + to_string(p->GetVentas());
+    string linea = p->GetId() + "," + p->GetJerarquia() + "," + to_string(p->GetStock()) + "," + to_string(p->GetVentas())+","+to_string(p->GetReposicion());
     totalCompras += p->GetVentas();
     nProd += 1;
     outdata << linea << endl;
