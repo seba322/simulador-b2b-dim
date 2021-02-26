@@ -20,6 +20,11 @@
 #include <chrono>
 #include <algorithm>
 
+#include <unistd.h>
+#include <ios>
+
+
+
 using namespace std;
 
 #define MAX_BUFFER 2048
@@ -117,7 +122,7 @@ public:
   void ResetStock(){
     nReposicion=nReposicion+1;
     stock=stockInicial+(stockInicial*(nReposicion/100));
-    cout << "Aumentando n reposicion de "+ jerarquia+" "+to_string(nReposicion) << endl;
+    // cout << "Aumentando n reposicion de "+ jerarquia+" "+to_string(nReposicion) << endl;
   }
 
   int GetReposicion(){
