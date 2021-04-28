@@ -21,6 +21,8 @@ class Consumidor : public process
     int compras;
     int nCompras;
     int nFallidas;
+    char log_ranking[2048];
+    double priceW, popW, catW;
 
 protected:
     void inner_body(void);
@@ -31,7 +33,7 @@ public:
                string _id_rubro, map<string, Producto *> *_productos,
                map<string, Producto *> _productosSegmento, map<string, Producto *> _productosRubro,
                char *_salida_ventas,
-               char *_salida_recomendacion) : process(name)
+               char *_salida_recomendacion, char *_log_ranking, double _popW, double _catW, double _priceW) : process(name)
     {
         id_cliente = _id_cliente;
         id_segmento = _id_segmento;
@@ -46,7 +48,10 @@ public:
         nFallidas = 0;
         strcpy(salida_ventas, _salida_ventas);
         strcpy(salida_recomendacion, _salida_recomendacion);
-        
+        strcpy(log_ranking, _log_ranking);
+        popW = _popW;
+        priceW = _priceW;
+        catW = _catW;
     }
     void Comprar(Venta *v);
 
@@ -150,9 +155,9 @@ public:
     //     auto finalP = *prodItr;
     //     return finalP->GetId();
     // }
-    string GetProductoSimilar(string jerarquia, int cantidad,string idProducto);
-    string GetProductoByRubro(string jerarquia, int cantidad,string idProducto);
-    string GetProductoBySegmento(string jerarquia, int cantidad,string idProducto);
+    string GetProductoSimilar(string jerarquia, int cantidad, string idProducto);
+    string GetProductoByRubro(string jerarquia, int cantidad, string idProducto);
+    string GetProductoBySegmento(string jerarquia, int cantidad, string idProducto);
     // void printel()
     // {
     //     vector<string>::iterator it;

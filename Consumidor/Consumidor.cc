@@ -45,20 +45,41 @@ string Consumidor::GetProductoSimilar(string jerarquia, int cantidad, string idP
             dist = 1;
          }
          prodSelect.push_back(producto);
-
+         // cout << producto->GetPrecio() << endl;
+         double price = (1 / producto->GetPrecio()) * priceW;
+         double puntaje = producto->GetPuntaje() * popW;
+         double category = dist * catW;
          // FUNCION DE RANKING
-         double rank = producto->GetPuntaje() * 0.30 + (1 / producto->GetPrecio()) * 0.30 + 0.5 * dist;
+         double rank = price + puntaje + category;
+
+         std::ofstream outdataRC;
+
+         outdataRC.open(log_ranking, std::ios::out | std::ios::app);
+         if (!outdataRC)
+         { // file couldn't be opened
+            cerr << "Error: file could not be opened" << endl;
+            exit(1);
+         }
+
+         outdataRC << to_string(puntaje) + "," + to_string(price) + "," + to_string(category) << endl;
+
+         outdataRC.close();
          // cout << " similar: " + producto->GetId() + "rank: " + to_string(rank) << endl;
-         rankings.push_back(rank);
+         if (rank > 0.0)
+         {
+
+            rankings.push_back(rank);
+         }
       }
    }
    // cout << "3 " << endl;
+
    if (rankings.size() == 0)
    {
       // cout << "4 " << endl;
       auto prod = productos->find(idProducto)->second;
       prod->ResetStock();
-        
+
       return "-1";
    }
 
@@ -121,6 +142,7 @@ string Consumidor::GetProductoBySegmento(string jerarquia, int cantidad, string 
          rankings.push_back(rank);
       }
    }
+
    // cout << "3 " << endl;
    if (rankings.size() == 0)
    {
@@ -240,6 +262,7 @@ void Consumidor::Comprar(Venta *v)
       {
          // cout <<"No Hay stock"<< endl;
          string idSimilar = "-1";
+         auto t1 = std::chrono::high_resolution_clock::now();
          if (v->tipoRecomendacion == 2)
          {
 
@@ -255,6 +278,29 @@ void Consumidor::Comprar(Venta *v)
 
             idSimilar = GetProductoSimilar(producto->GetJerarquia(), cantidad, idProducto);
          }
+
+         auto t2 = std::chrono::high_resolution_clock::now();
+
+         double duration = std::chrono::duration_cast<std::chrono::microseconds>(t2 - t1).count();
+
+         auto timeDuration = duration / 1000;
+         //#############################################
+
+         // std::ofstream outdataTime;
+
+         // outdataTime.open("tiempoRec0.txt", std::ios::out | std::ios::app);
+         // if (!outdataTime)
+         // { // file couldn't be opened
+         //    cerr << "Error: file could not be opened" << endl;
+         //    exit(1);
+         // }
+
+         // outdataTime << std::fixed << std::setprecision(8) << timeDuration;
+         // outdataTime << ",";
+         // outdataTime.close();
+
+         //################################################33
+
          // cout << "obtenido similar " + idSimilar << endl;
          if (idSimilar != "-1")
          {

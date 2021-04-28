@@ -29,6 +29,9 @@ private:
   char archivo_rubros[2048];
   int tipoRec;
   char salida_recomendacion[2048];
+  char log_ranking[2048];
+  double priceW, popW, catW;
+
   // //Queries
 
   //Generador de tasa dellegada
@@ -49,7 +52,11 @@ public:
           char *_archivo_segmentos,
           char *_archivo_rubros,
           int _tipoRec,
-          char *_salida_recomendacion) : process(_name)
+          char *_salida_recomendacion,
+          char *_log_ranking,
+          double _priceW,
+          double _popW,
+          double _catW) : process(_name)
   {
     simLen = _sl;
 
@@ -63,6 +70,10 @@ public:
     strcpy(archivo_rubros, _archivo_rubros);
     tipoRec = _tipoRec;
     strcpy(salida_recomendacion, _salida_recomendacion);
+    strcpy(log_ranking, _log_ranking);
+    popW = _popW;
+    catW = _catW;
+    priceW = _priceW;
   }
 
 public:
@@ -121,82 +132,90 @@ void sistema::inner_body(void)
   // Segmentos
   map<string, map<string, Producto *>> segmentos;
 
-  // crear estructura de productos de archivo de productos
-  fin.open(archivo_segmentos);
-
-  if (!fin)
-  { // file couldn't be opened
-    cerr << "Error: file could not be opened" << endl;
-    exit(1);
-  }
-  while (getline(fin, linea))
+  if (tipoRec == 1)
   {
-    // cout << "LineaS: " << linea << endl;
-    tokens.clear();
-    util->Tokenize(linea, tokens, " ");
-    string idSegmento = tokens[0].c_str();
-    cout << " Agregando Segmento: " + idSegmento << endl;
-    vector<string>::iterator it = tokens.begin();
-    map<string, Producto *> currentProduct;
+    cout << "Cargando segmentos" << endl;
+    // crear estructura de productos de archivo de productos
+    fin.open(archivo_segmentos);
 
-    for (it++; it != tokens.end(); it++)
-    {
-      auto currentProd = *it;
-      vector<string> productVector;
-      util->Tokenize(currentProd, productVector, ",");
-      double puntaje = atof(productVector[2].c_str());
-      // cout << productVector[0].c_str() << endl;
-      Producto *p = new Producto(productVector[0].c_str(), productVector[2].c_str(), puntaje, 0, 0);
-      auto el = pair<string, Producto *>(productVector[0].c_str(), p);
-
-      currentProduct.insert(el);
+    if (!fin)
+    { // file couldn't be opened
+      cerr << "Error: file could not be opened" << endl;
+      exit(1);
     }
+    while (getline(fin, linea))
+    {
+      // cout << "LineaS: " << linea << endl;
+      tokens.clear();
+      util->Tokenize(linea, tokens, " ");
+      string idSegmento = tokens[0].c_str();
+      cout << " Agregando Segmento: " + idSegmento << endl;
+      vector<string>::iterator it = tokens.begin();
+      map<string, Producto *> currentProduct;
 
-    auto elProd = pair<string, map<string, Producto *>>(idSegmento, currentProduct);
-    segmentos.insert(elProd);
+      for (it++; it != tokens.end(); it++)
+      {
+        auto currentProd = *it;
+        vector<string> productVector;
+        util->Tokenize(currentProd, productVector, ",");
+        double puntaje = atof(productVector[2].c_str());
+        // cout << productVector[0].c_str() << endl;
+        Producto *p = new Producto(productVector[0].c_str(), productVector[2].c_str(), puntaje, 0, 0);
+        auto el = pair<string, Producto *>(productVector[0].c_str(), p);
+
+        currentProduct.insert(el);
+      }
+
+      auto elProd = pair<string, map<string, Producto *>>(idSegmento, currentProduct);
+      segmentos.insert(elProd);
+    }
+    fin.close();
   }
-  fin.close();
 
   //rubros
 
   map<string, map<string, Producto *>> rubros;
 
-  // crear estructura de productos de archivo de productos
-  fin.open(archivo_rubros);
-
-  if (!fin)
-  { // file couldn't be opened
-    cerr << "Error: file could not be opened" << endl;
-    exit(1);
-  }
-  while (getline(fin, linea))
+  if (tipoRec == 2)
   {
-    // cout << "LineaR: " << linea << endl;
-    tokens.clear();
-    util->Tokenize(linea, tokens, " ");
-    string idRubro = tokens[0].c_str();
-    cout << " Agregando Rubro: " + idRubro << endl;
-    vector<string>::iterator it = tokens.begin();
-    map<string, Producto *> currentProduct;
+    cout << "Cargando rubros" << endl;
+    // crear estructura de productos de archivo de productos
+    fin.open(archivo_rubros);
 
-    for (it++; it != tokens.end(); it++)
-    {
-      auto currentProd = *it;
-      vector<string> productVector;
-      util->Tokenize(currentProd, productVector, ",");
-      double puntaje = atof(productVector[1].c_str());
-      //  cout << "Comienza SIMULACION: "+ productVector[2] << endl;
-      Producto *p = new Producto(productVector[0].c_str(), productVector[2].c_str(), puntaje, 0, 0);
-      p->GetJerarquia();
-      auto el = pair<string, Producto *>(productVector[0].c_str(), p);
-      // cout << el.second->GetJerarquia() + el.first   << endl;
-      currentProduct.insert(el);
+    if (!fin)
+    { // file couldn't be opened
+      cerr << "Error: file could not be opened" << endl;
+      exit(1);
     }
+    while (getline(fin, linea))
+    {
+      // cout << "LineaR: " << linea << endl;
+      tokens.clear();
+      util->Tokenize(linea, tokens, " ");
+      string idRubro = tokens[0].c_str();
+      cout << " Agregando Rubro: " + idRubro << endl;
+      vector<string>::iterator it = tokens.begin();
+      map<string, Producto *> currentProduct;
 
-    auto elProd = pair<string, map<string, Producto *>>(idRubro, currentProduct);
-    rubros.insert(elProd);
+      for (it++; it != tokens.end(); it++)
+      {
+        auto currentProd = *it;
+        vector<string> productVector;
+        util->Tokenize(currentProd, productVector, ",");
+        double puntaje = atof(productVector[1].c_str());
+        //  cout << "Comienza SIMULACION: "+ productVector[2] << endl;
+        Producto *p = new Producto(productVector[0].c_str(), productVector[2].c_str(), puntaje, 0, 0);
+        p->GetJerarquia();
+        auto el = pair<string, Producto *>(productVector[0].c_str(), p);
+        // cout << el.second->GetJerarquia() + el.first   << endl;
+        currentProduct.insert(el);
+      }
+
+      auto elProd = pair<string, map<string, Producto *>>(idRubro, currentProduct);
+      rubros.insert(elProd);
+    }
+    fin.close();
   }
-  fin.close();
 
   // crear estructura de clientes de estructura de clientes
   cout << "5.3 " << endl;
@@ -211,19 +230,31 @@ void sistema::inner_body(void)
     string idRubro = tokens[2].c_str();
 
     // se lee estructura de prodctos por segmento y rubro de ese cliente
-    // cout << "Buscnado Segmento: " + idSegmento << endl;
     map<string, Producto *>::iterator itr;
-    map<string, Producto *> prodSegmentos = segmentos.find(idSegmento)->second;
-    // cout << "5.3.1 " + idSegmento<< endl;
+    // cout << "Buscnado Segmento: " + idSegmento << endl;
+    map<string, Producto *> prodSegmentos;
+    map<string, Producto *> prodRubro;
+    // cout << "5.3.4 " << endl;
+    // cout << "5.3.5 " << endl;
+    if (tipoRec == 2)
+    {
+      prodRubro = rubros.find(idRubro)->second;
+    }
+    // cout << "5.3.2 " << endl;
+    if (tipoRec == 1)
+    {
+      prodSegmentos = segmentos.find(idSegmento)->second;
+    }
+    // cout << prodSegmentos.size();
     // for (itr = prodSegmentos.begin(); itr != prodSegmentos.end(); itr++)
     // {
     //   cout << "P: " + itr->first + " " + itr->second->GetId() << endl;
     // }
+    // cout << "5.3.1 " + idSegmento << endl;
+
     // auto ell = prodSegmentos.begin()->second;
     // cout << "Buscnado Rubro: " + idRubro << endl;
-    map<string, Producto *> prodRubro = rubros.find(idRubro)->second;
-    // cout << "5.3.2 " << endl;
-    handle<Consumidor> c = new Consumidor("CLIENTE_" + idCliente, idCliente, idSegmento, idRubro, &productos, prodSegmentos, prodRubro, salida_ventas, salida_recomendacion);
+    handle<Consumidor> c = new Consumidor("CLIENTE_" + idCliente, idCliente, idSegmento, idRubro, &productos, prodSegmentos, prodRubro, salida_ventas, salida_recomendacion, log_ranking, popW, catW, priceW);
     auto el = pair<string, handle<Consumidor>>(idCliente, c);
     // cout << "Insertando:  " + (*el.second)->getIdCliente() +"inicio "+ (*consumidores.begin()->second)->getIdCliente()+ " tamaño: "+to_string(consumidores.size()) << endl;
     // (*el.second)->getIdCliente();
@@ -276,7 +307,7 @@ void sistema::inner_body(void)
   for (itr = productos.begin(); itr != productos.end(); itr++)
   {
     auto p = itr->second;
-    string linea = p->GetId() + "," + p->GetJerarquia() + "," + to_string(p->GetStock()) + "," + to_string(p->GetVentas())+","+to_string(p->GetReposicion());
+    string linea = p->GetId() + "," + p->GetJerarquia() + "," + to_string(p->GetStock()) + "," + to_string(p->GetVentas()) + "," + to_string(p->GetReposicion());
     totalCompras += p->GetVentas();
     nProd += 1;
     outdata << linea << endl;
@@ -308,6 +339,10 @@ void sistema::inner_body(void)
   }
   outdataClient.close();
 
+  productos.clear();
+  consumidores.clear();
+  segmentos.clear();
+  rubros.clear();
   // //   cout << "escribiendo ventas2 " << endl;
   // //   auto c = itr->second;
   // //   cout << "escribiendo ventas2,1 " << (*c)->getIdCliente() << (*c)->getNCompras() << endl;
@@ -341,41 +376,38 @@ void sistema::inner_body(void)
 /***************************************************************/
 
 /***************************************************************/
-void process_mem_usage(double& vm_usage, double& resident_set)
+void process_mem_usage(double &vm_usage, double &resident_set)
 {
-   using std::ios_base;
-   using std::ifstream;
-   using std::string;
+  using std::ifstream;
+  using std::ios_base;
+  using std::string;
 
-   vm_usage     = 0.0;
-   resident_set = 0.0;
+  vm_usage = 0.0;
+  resident_set = 0.0;
 
-   // 'file' stat seems to give the most reliable results
-   //
-   ifstream stat_stream("/proc/self/stat",ios_base::in);
+  // 'file' stat seems to give the most reliable results
+  //
+  ifstream stat_stream("/proc/self/stat", ios_base::in);
 
-   // dummy vars for leading entries in stat that we don't care about
-   //
-   string pid, comm, state, ppid, pgrp, session, tty_nr;
-   string tpgid, flags, minflt, cminflt, majflt, cmajflt;
-   string utime, stime, cutime, cstime, priority, nice;
-   string O, itrealvalue, starttime;
+  // dummy vars for leading entries in stat that we don't care about
+  //
+  string pid, comm, state, ppid, pgrp, session, tty_nr;
+  string tpgid, flags, minflt, cminflt, majflt, cmajflt;
+  string utime, stime, cutime, cstime, priority, nice;
+  string O, itrealvalue, starttime;
 
-   // the two fields we want
-   //
-   unsigned long vsize;
-   long rss;
+  // the two fields we want
+  //
+  unsigned long vsize;
+  long rss;
 
-   stat_stream >> pid >> comm >> state >> ppid >> pgrp >> session >> tty_nr
-               >> tpgid >> flags >> minflt >> cminflt >> majflt >> cmajflt
-               >> utime >> stime >> cutime >> cstime >> priority >> nice
-               >> O >> itrealvalue >> starttime >> vsize >> rss; // don't care about the rest
+  stat_stream >> pid >> comm >> state >> ppid >> pgrp >> session >> tty_nr >> tpgid >> flags >> minflt >> cminflt >> majflt >> cmajflt >> utime >> stime >> cutime >> cstime >> priority >> nice >> O >> itrealvalue >> starttime >> vsize >> rss; // don't care about the rest
 
-   stat_stream.close();
+  stat_stream.close();
 
-   long page_size_kb = sysconf(_SC_PAGE_SIZE) / 1024; // in case x86-64 is configured to use 2MB pages
-   vm_usage     = vsize / 1024.0;
-   resident_set = rss * page_size_kb;
+  long page_size_kb = sysconf(_SC_PAGE_SIZE) / 1024; // in case x86-64 is configured to use 2MB pages
+  vm_usage = vsize / 1024.0;
+  resident_set = rss * page_size_kb;
 }
 /***************************************************************/
 
@@ -395,7 +427,9 @@ int main(int argc, char *argv[])
   char archivo_segmentos[2048];
   char archivo_rubros[2048];
   char salida_recomendacion[2048];
+  char log_ranking[2048];
   int tipoRec;
+  double popW, priceW, catW;
   // //Queries
   // int TQ = atoi(argv[1]); //Total consulats a procesar en cada nodo
 
@@ -412,6 +446,11 @@ int main(int argc, char *argv[])
   strcpy(archivo_rubros, argv[8]);
   tipoRec = atoi(argv[9]);
   strcpy(salida_recomendacion, argv[10]);
+  strcpy(log_ranking, argv[11]);
+
+  popW = atof(argv[12]);
+  catW = atof(argv[13]);
+  priceW = atof(argv[14]);
 
   cout << archivo_ventas << endl;
   cout << archivo_productos << endl;
@@ -423,13 +462,18 @@ int main(int argc, char *argv[])
   cout << archivo_rubros << endl;
   cout << to_string(tipoRec) << endl;
   cout << salida_recomendacion << endl;
+  cout << log_ranking << endl;
+  cout << to_string(popW) << endl;
+  cout << to_string(catW) << endl;
+  cout << to_string(priceW) << endl;
+
   //------------------------------------------------------
 
   simulation::instance()->begin_simulation(new sqsDll());
   cout << "3" << endl;
 
   handle<sistema> system(new sistema("System main", 10000000e100,
-                                     archivo_ventas, archivo_productos, archivo_clientes, salida_clientes, salida_productos, salida_ventas, archivo_segmentos, archivo_rubros, tipoRec, salida_recomendacion));
+                                     archivo_ventas, archivo_productos, archivo_clientes, salida_clientes, salida_productos, salida_ventas, archivo_segmentos, archivo_rubros, tipoRec, salida_recomendacion, log_ranking, priceW, popW, catW));
 
   cout << "4 " << endl;
   system->activate();
@@ -441,14 +485,14 @@ int main(int argc, char *argv[])
   simulation::instance()->end_simulation();
   auto t2 = std::chrono::high_resolution_clock::now();
 
-  auto duration = std::chrono::duration_cast<std::chrono::milliseconds>(t2 - t1).count();
+  double duration = std::chrono::duration_cast<std::chrono::milliseconds>(t2 - t1).count();
 
-cout << "Tiempo:" << endl;
-  std::cout << duration/1000;
+  cout << "Tiempo:" << endl;
+  std::cout << duration / 1000;
 
   double vm, rss;
-   process_mem_usage(vm, rss);
-   cout << "VM: " << vm << "; RSS: " << rss << endl;
+  process_mem_usage(vm, rss);
+  cout << "VM: " << vm << "; RSS: " << rss << endl;
 
   //------------------------------------------------------
 
